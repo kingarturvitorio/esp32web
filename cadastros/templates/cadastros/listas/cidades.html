@@ -1,0 +1,83 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+
+{% load static %}
+
+{% block content %}
+
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Informações Cidades</h3>
+            </div>
+
+        </div>
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Lista de Cidades Registradas:</h2>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="x_content">
+
+                        <form action="?" method="GET">
+
+                            <input type="text" name="nome" id="" value="{{ request.GET.nome }}" class="p-1 border"
+                                autocomplete="off" placeholder="Nome ou parte dele">
+
+                            <button type="submit" class="btn btn-success">Buscar</button>
+
+                            <a href="{% url 'listar-cidade' %}" class="btn btn-light">Limpar</a>
+
+                        </form>
+
+                        <hr>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cidade</th>
+                                    <th>Estado</th>
+                                    <th>Opções</th>
+                                </tr>
+
+                                {% for object in object_list %}
+                                <tr>
+                                    <td>{{ object.id }}</td>
+                                    <td>{{ object.nome }}</td>
+                                    <td>{{ object.estado }}</td>
+                                    <td>
+                                        <a href="" class="btn btn-warning btn-sm" title="Editar">
+                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="" class="btn btn-danger btn-sm" title="Excluir">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3">Nenhuma cidade registrada.</td>
+                                </tr>
+                                {% endfor %}
+
+                            </table>
+
+                            {% block extrascripts %}
+                                {% include "dashboard/_pagination.html" %}
+                            {% endblock extrascripts %}
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,2 @@
+# força todos .py a sempre serem commitados com LF
+*.py text eol=lf

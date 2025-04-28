@@ -1,0 +1,217 @@
+{% load static %}
+
+<!doctype html>
+<html lang="pt-br" class="h-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Artur Vitório Andrade Santos">
+
+    {% block titulo %}
+    <title>:: Laboratório Engenharia de Controle e Automação ::</title>
+    {% endblock %}
+
+    <!-- Ícone do favicon -->
+    <link href="{% static 'img/logo-ifro.png' %}" rel="shortcut icon" type="image/x-icon" />
+
+
+    <!-- Importação do Bootstrap 4 e do Font awesome -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+
+    <!-- CSS adicional -->
+    <link href="{% static 'css/lic.css' %}" rel="stylesheet">
+
+    <link href="https://cdn.datatables.net/v/bs4/dt-2.0.2/datatables.min.css" rel="stylesheet">
+
+
+    <!-- Importação do Datatables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.22/datatables.min.css" />
+
+    <!-- Ícone na barra de abas -->
+    <!-- <link rel="shortcut icon" href="{% static 'img/favicon.png' %}"> -->
+
+    <!-- Bloco destinado aos estilos para cada página -->
+    {% block styles %}
+
+    {% endblock %}
+
+</head>
+
+<body class="d-flex flex-column h-100">
+    <main role="main" class="flex-shrink-0">
+
+
+        <!-- Bloco com a logo da cidade -->
+        {% block logo %}
+        <!-- <div class="container-fluid bg-white">
+            <div class="container border-bottom border-light p-3">
+                <img src="{% static 'img/lic-logo.png' %}" alt="" style="max-height: 65px;" class="img-fluid">
+            </div>
+
+        </div> -->
+        {% endblock %}
+
+
+        <!-- Bloco com o menu principal -->
+        {% block menu %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-lic font-115 shadow">
+
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'img/logo-ifro.png' %}" height="40" alt="">
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav mr-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'index' %}">
+                                <i class="fa fa-home" aria-hidden="true"></i>
+                                Início
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'aulas' %}">
+                                <i class="fa fa-book" aria-hidden="true"></i>
+                                Aulas
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projetos' %}">
+                                <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                                Projetos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'alunos' %}">
+                                <i class="fa fa-group" aria-hidden="true"></i>
+                                Alunos
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'homedashboard' %}">
+                                <i class="fa fa-unlock-alt" aria-hidden="true"></i>
+                                Acesso Restrito
+                            </a>
+                        </li>
+
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{% url 'sobre' %}">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                Sobre
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{% url 'contato' %}">
+                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                Contato
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- fim do container -->
+            </div>
+        </nav>
+        {% endblock %}
+
+
+        <!-- Bloco de conteúdo -->
+        <div class="container py-5">
+            {% block conteudo %}
+                <!-- Page Content-->
+                <div class="container px-4 px-lg-5">
+                    <!-- Heading Row-->
+                    <div class="row gx-4 gx-lg-5 align-items-center my-5">
+                        <div class="col-lg-12">
+                            <h1 class="font-weight-light">Engenharia de Controle e Automação</h1>
+                            <p>Site dedicado as informação do professor Artur e Laboratório de Engenharia de Controle e Automação. Se você é aluno dele, pode ser útil para você.</p>
+                            <a class="btn btn-primary" href="https://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8148284Y1&tokenCaptchar=03AFcWeA6KCB3Cil5v30apPE3ACqUwu3rVQfGSswe4s9bxXJ1w2rLooRPr-mOdCoFt-sB--5M4Wslrfu1TpF7e5wPyjMxh2s_nhiz9yzy6lTChQWiba7Bf_wCqkI5jUsK7npI64_jagA4cPaphwCv6HxNqF-oTx3sxKFdWTXzBb_D3GN5qAXEE9CxTts4iJAirTeWYQW_d6Nm0q-wHDXBoYAQ-ShCg5ymg-5xYydGKrs1BVUsA5w9mbtTOOEU5L5TyN9kVZy9s5oc3wrS-6ApUGe_AGW2yPVmHdrXEODRMOcy7QO6mAREXSzWpOshUGwh0ynVLP9-lsKL-pIZjw8szVU-HRtgKf4xZ7JoAnKCiAw3hk4COdG1FYHiV0MNDw9YcBmRqZSDF2GxgSDG-p3btfwBw9s3bqU2WwwUR53fUYcRDcqGYzJbWyohjXMcLCmyxTXWSY5x4V1P3wnx1U7wvSGhqZTGPr4DrYuJshA9jnQq5zjqoCSq3OVc9splIiGdxjqIW8HZTzaLgMgk0w8zgF26tXqzEdjj_feBbPIqvBnmRBXop5cBSwSX5oUnvcNZtBSwIQOcfLkf0KBz58HzEs7hZQViK-TYnMGuWXB4Irtc1iSQ4hnX2xT5K1DIcPL0RRaBwhZsBwFK5dM5Z4X7Tj9xhxDgveMxjSIG7uql5_8jwu-UFyLfujL8">Acesso ao currículo Lattes!</a>
+                        </div>
+                    </div>
+                    <!-- Content Row-->
+                    <div class="row gx-4 gx-lg-5">
+                        <div class="col-md-4 mb-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h2 class="card-title">Você faz estágio?</h2>
+                                    <p class="card-text">Acesse as informações de estágio e verifique o que você deve fazer, caso tenha dúvidas, procurar o professor.</p>
+                                </div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" href="{% url 'estagio' %}">Mais informações</a></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h2 class="card-title">Você faz pesquisa?</h2>
+                                    <p class="card-text">Acessa as informações relacionadas a pesquisa, onde publicar, tipo de estágios, templates e mais informações aqui.</p>
+                                </div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" href="{% url 'pesquisa' %}">Acessar informações de pesquisa</a></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h2 class="card-title">Fazendo TCC?</h2>
+                                    <p class="card-text">Verifique as informações disponibilizadas pelo professor</p>
+                                </div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" href="{% url 'tcc' %}">Mais informações do TCC</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+        </div>
+
+    </main>
+
+    <footer class="mt-auto">
+        <!-- Rodapé -->
+        {% block rodape %}
+        <div class="container-fluid bg-light text-center p-3">
+            <div class="row">
+                <div class="col-md-4 mx-auto text-center">
+                    <img src="{% static 'img/logo-ifro.png' %}" height="48" class="float-left" alt="">
+                    <p>
+                        <span class="lead">Laboratório de Engenharia de Controle e Automação 
+                            - Instituto Federal de Rondônia</span><br>
+                        <span>Desenvolvido por Artur Vitório Andrade Santos</span>
+                    </p>
+                </div>
+                <!-- <div class="col-md text-left">
+                    <img src="{% static 'img/lic.png' %}" height="100" alt="">
+                </div> -->
+
+                </p>
+            </div>
+            {% endblock %}
+
+    </footer>
+
+
+    <!-- Importação do JS -->
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="https://cdn.datatables.net/v/bs4/dt-2.0.2/datatables.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.22/datatables.min.js"></script>
+
+    <!-- Bloco destinado aos scripts para cada página -->
+    {% block scripts %}
+
+    {% endblock %}
+
+</body>
+
+</html>

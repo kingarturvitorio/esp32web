@@ -1,0 +1,186 @@
+{% extends 'site/modelo_site.html' %}
+<!-- index.html -->
+
+
+{% block content %}
+
+<head>
+    <title>Gráficos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+    <div class="row">
+        <div class="col-2 col-md-6 col-xxl-6">
+          <div class="card rounded-0 border-0">
+            <div class="card-header bg-dark-gray text-bg-white">
+              <p class="text-center card-text">
+
+                <canvas id="grafico_temperatura" width="200" height="120"></canvas>
+                <script>
+                    $(document).ready(function () {
+                        var ctx = document.getElementById('grafico_temperatura').getContext('2d');
+                        var chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: 'Luminosidade',
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    data: [],
+                                    fill: false
+                                }],
+                            },
+                            options: {
+                                scales: {
+                                    x: {
+                                        ticks: {
+                                            display: true
+                                        },
+                                        gridLines: {
+                                            display: true
+                                        }
+                                    },
+                                    // y: {
+                                    //     suggestedMin: 20,
+                                    //     suggestedMax: 60,
+                                    // }
+                                }
+                            }
+                        });
+            
+                        $.ajax({
+                            url: '/plotar-dados-lista-luminosidades/',  // Substitua pelo URL correto da sua visão Django
+                            success: function (response) {
+                                chart.data.labels = response.timestamps
+                                chart.data.datasets[0].data = response.luminosidades
+                                
+                                chart.update();
+                                // console.log(response);
+                            }
+                        });
+            
+                        setInterval(async function () {
+                            $.ajax({
+                                url: '/dados-sensor-luminosidade/',  // Substitua pelo URL correto da sua visão Django
+                                success: function (response) {
+                                    chart.data.labels.push(response.timestamps)
+                                    chart.data.datasets[0].data.push(response.luminosidades)
+            
+                                    chart.update();
+                                    // console.log(response);
+                                }
+                            });
+                        }, 500);  // Atualiza a cada 5 segundos (5000 milissegundos)
+                    });
+                </script>
+
+ 
+              </p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="col-2 col-md-6 col-xxl-6">
+          <div class="card rounded-0 border-0">
+            <div class="card-header bg-dark-gray text-bg-white">
+              <p class="text-center card-text">
+
+                <canvas id="grafico_humidity" width="100" height="60"></canvas>
+                <script>
+                    $(document).ready(function () {
+                        var ctx = document.getElementById('grafico_humidity').getContext('2d');
+                        
+                        var updateCount = 0;
+                        
+                        var chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: [],
+                                datasets: [{
+                                    label: 'Controlador',
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    data: [],
+                                    fill: false
+                                }],
+                            },
+                            options: {
+                                scales: {
+                                    x: {
+                                        
+                                        ticks: {
+                                            display: true,
+                                            beginAtZero:true,
+                                        },
+                                        gridLines: {
+                                            display: true
+                                        },
+                                    }
+                                    // y: {
+                                    //     suggestedMin: 20,
+                                    //     suggestedMax: 60,
+                                    // }
+                                }
+                            }
+                        });
+            
+                        $.ajax({
+                            url: '/plotar-dados-lista-controladores/',  // Substitua pelo URL correto da sua visão Django
+                            success: function (response) {
+                                chart.data.labels = response.timestamps
+                                chart.data.datasets[0].data = response.controladores    
+                                chart.update();
+                                // console.log(response);
+                            }
+                        });
+            
+                        setInterval(async function () {
+                            $.ajax({
+                                url: '/plotar-dados-controlador/',  // Substitua pelo URL correto da sua visão Django
+                                success: function (response) {
+                                    var numberElements = 70;
+                                    chart.data.labels.push(response.timestamps)
+                                    chart.data.datasets[0].data.push(response.controladores)
+                                    // // Mantém apenas os últimos 60 segundos de dados
+                                    // if (chart.data.labels.length > numberElements) {
+                                    //     chart.data.labels.shift();
+                                    //     chart.data.datasets[0].data.shift();
+                                    //     chart.data.labels.push(response.timestamps)
+                                    //     chart.data.datasets[0].data.push(response.controladores)
+                                    //     // console.log('printei');
+                                    //     // console.log(chart.data.labels.length);
+                                    // }
+                                    // if(updateCount > numberElements){
+                                    //     console.log('printei');
+                                    //     chart.data.labels.shift()
+                                    //     chart.data.datasets[0].data.shift();
+                                    // }
+                                    // else updateCount++;
+                                    chart.update();
+                                    
+                                    // console.log(response);
+                                }
+                            });
+                        }, 500);  // Atualiza a cada 5 segundos (5000 milissegundos)
+                    });
+                </script>
+
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      </div>
+      
+      
+</body>
+
+
+{% block scripts %} 
+
+
+{% endblock %}
+{% endblock %}

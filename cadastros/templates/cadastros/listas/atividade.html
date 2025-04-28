@@ -1,0 +1,86 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{%load static}
+
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Listar Atividades</h3>
+            </div>
+
+            <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <form method="get" action="{% url 'listar-atividade' %}"></form>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="nome" placeholder="Nome"
+                            value="{{ request.GET.nome }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Pesquisar</button>
+                        </span>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Lista de Atividade registrados:</h2>
+                        <div class="col-md-2">
+                            <a href="{% url 'cadastrar-atividade' %}"
+                                class="btn btn-primary btn-sm float-right">Adicionar
+                                Atividade</a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Descrição</th>
+                                    <th>Pontuação</th>
+                                    <th>Detalhe</th>
+                                    <th>Opções</th>
+                                </tr>
+
+                                {% for atividade in object_list %}
+                                <tr>
+                                    <td>{{atividade.numero}}</td>
+                                    <td>{{atividade.descricao}}</td>
+                                    <td>{{atividade.pontos}}</td>
+                                    <td>{{atividade.detalhes}}</td>
+                                    <td>
+                                        <a href="{% url 'editar-atividade' atividade.pk %}"
+                                            class="btn btn-warning btn=sm" title="Editar">E</a>
+                                        <a href="{% url 'excluir-atividade' atividade.pk %}"
+                                            class="btn btn-danger btn=sm" title="Excluir">X</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3">Nenhuma atividade registrada</td>
+                                </tr>
+                                {% endfor %}
+
+
+                            </table>
+                        </div>
+
+                        {% block scripts %}
+
+                        <script>
+
+                            $(document).ready(function () {
+                                alert("importação ok!");
+                            });
+
+                        </script>
+
+                        {% endblock %}
+
+                        {% endblock %}

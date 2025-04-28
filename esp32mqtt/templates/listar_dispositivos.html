@@ -1,0 +1,60 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% load static %}
+
+
+
+{% block content %}
+
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Meus Dispositivos ESP32</h3>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <div class="col-md-2">
+                            <a href="{% url 'criar-dispositivos' %}">Novo dispositivo</a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="x_content">
+
+                        <ul>
+                            {% for d in object_list %}
+                            <li>
+                                <strong>{{ d.nome }}</strong> - {{ d.identificador }}
+                                <span id="status-{{ d.identificador }}">
+                                    {% if d.esta_online %}
+                                    <span style="color: green;">🟢 Online</span>
+                                    {% else %}
+                                    <span style="color: red;">🔴 Offline</span>
+                                    {% endif %}
+                                </span>
+                                <a href="{% url 'editar-dispositivos' d.pk %}">Editar</a>
+                                <a href="{% url 'deletar-dispositivos' d.pk %}">Remover</a>
+                            </li>
+                            {% endfor %}
+
+                            <hr>
+                            <h4>Mensagens Recebidas:</h4>
+                            <div id="mensagens-mqtt"
+                                style="max-height: 300px; overflow-y: auto; font-family: monospace;"></div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

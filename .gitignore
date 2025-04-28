@@ -1,0 +1,9 @@
+venv
+*/_pycache_
+runServer.bat
+*/.lock
+*/db.sqlite3
+*/db.sqlite3
+*/db2.sqlite3
+db.sqlite3
+uploads

@@ -1,0 +1,13 @@
+{% extends 'site/modelo_site.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Página inicial</h3>
+
+{% if user.perfil.nome_completo % }
+Bem vindo ao sistema {{ usuario.perfil.nome_completo }}
+{% else %}
+Você precisa completar seu cadastro. Acesse os <a href="{% url 'atualizar-dados' %}">meus dados</a> para atualizar.
+
+{% endblock %}

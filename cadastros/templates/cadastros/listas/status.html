@@ -1,0 +1,78 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3>Listar Campus</h3>
+            </div>
+
+            <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <form method="get" action="{% url 'listar-status' %}"></form>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="nome" placeholder="Nome"
+                            value="{{ request.GET.nome }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Pesquisar</button>
+                        </span>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Lista de Campi registrados:</h2>
+                        <div class="col-md-2">
+                            <a href="{% url 'cadastrar-status' %}" class="btn btn-primary btn-sm float-right">Adicionar
+                                Campus</a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Opções</th>
+                                </tr>
+
+                                {% for object in object_list %}
+                                <tr>
+                                    <td>{{ object.nome }}</td>
+                                    <td>{{ object.descricao }}</td>
+                                    <td>
+                                        <a href="{% url 'editar-status' object.pk %}" class="btn btn-warning btn-sm"
+                                            title="Editar">
+                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="{% url 'excluir-status' object.pk %}" class="btn btn-danger btn-sm"
+                                            title="Excluir">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3">Nenhum status registrado.</td>
+                                </tr>
+                                {% endfor %}
+
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
