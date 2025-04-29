@@ -8,7 +8,7 @@ from .models import Estado, Cidade, Campus, Servidor, Status, Situacao, Classe, 
 from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from braces.views import GroupRequiredMixin
+#from braces.views import GroupRequiredMixin
 
 from django.shortcuts import get_object_or_404
 
@@ -74,7 +74,7 @@ class ProgressaoCreate(LoginRequiredMixin, CreateView):
         url = super().form_valid(form)
         return url
 
-class CampoCreate(GroupRequiredMixin, LoginRequiredMixin, CreateView):
+class CampoCreate(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('login')
     group_required = u"Administrador"
     model = Campo
@@ -179,7 +179,7 @@ class ProgressaoUpdate(LoginRequiredMixin, UpdateView):
         return self.object
 
 
-class CampoUpdate(GroupRequiredMixin, LoginRequiredMixin, UpdateView):
+class CampoUpdate(LoginRequiredMixin, UpdateView):
     login_url = reverse_lazy('login')
     group_required = u"Administrador"
     model = Campo
@@ -263,7 +263,7 @@ class ProgressaoDelete(LoginRequiredMixin, DeleteView):
         return self.object
 
 
-class CampoDelete(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
+class CampoDelete(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('login')
     group_required = u"Administrador"
     model = Campo
