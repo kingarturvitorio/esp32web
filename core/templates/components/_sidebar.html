@@ -8,7 +8,7 @@
       <div class="collapse d-sm-block" id="menuCollapse">
         <ul class="nav flex-column align-items-start" id="menu">
           <li>
-            <a href="{% url 'calendario:calendar' %}" class="nav-link px-0 align-middle">
+            <a href="{% url 'homedashboard' %}" class="nav-link px-0 align-middle">
               <i class="bi bi-calendar4-week fs-4"></i>
               <span class="ms-1">Agendamento</span>
             </a>
@@ -20,31 +20,31 @@
             </a>
           </li>
           <li>
-            <a href="{% url 'paciente-list' %}" class="nav-link px-0 align-middle">
+            <a href="{% url 'listar-classe' %}" class="nav-link px-0 align-middle">
               <i class="bi bi-people-fill fs-4"></i>
               <span class="ms-1">Paciente</span>
             </a>
           </li>
           <li>
-            <a href="{% url 'terapeuta-list' %}" class="nav-link px-0 align-middle">
+            <a href="{% url 'listar-progressao' %}" class="nav-link px-0 align-middle">
               <i class="bi bi-file-medical fs-4"></i>
               <span class="ms-1">Terapeuta</span>
             </a>
           </li>
           <li>
-            <a href="#" class="nav-link px-0 align-middle">
+            <a href="{% url 'listar-cidade' %}" class="nav-link px-0 align-middle">
               <i class="bi bi-calendar-check fs-4"></i>
               <span class="ms-1">Prontuário</span>
             </a>
           </li>
           <li>
-            <a href="{% url 'relatorio-list' %}" class="nav-link px-0 align-middle">
+            <a href="{% url 'sistema-monitoramento' %}" class="nav-link px-0 align-middle">
               <i class="bi bi-pass-fill fs-4"></i>
               <span class="ms-1">Relatório</span>
             </a>
           </li>
           <li>
-            <a href="{% url 'usuarios:signout' %}" class="nav-link px-0 align-middle">
+            <a href="{% url 'logout' %}" class="nav-link px-0 align-middle">
               <i class="bi bi-toggle2-off fs-4"></i>
               <span class="ms-1">Sair do Sistema</span>
             </a>
