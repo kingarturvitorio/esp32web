@@ -25,7 +25,7 @@ function atualizarCard({ tipo, valor }) {
     luminosidade: 'lux',
     controlador: '',
     temp_termistor: '',
-    status: '',
+    // status: '',
     erro: ''
   };
   card.textContent = `${valor} ${unidades[tipo]}`;
@@ -41,12 +41,12 @@ function atualizarStatus({ identificador }) {
   }, 15000);
 }
 
-function logMQTT({ timestamp, identificador, status }) {
-  const mensagensDiv = document.getElementById('mensagens-mqtt');
-  const nova = document.createElement('div');
-  nova.innerText = `[${timestamp}] ${identificador}: ${status}`;
-  mensagensDiv.prepend(nova);
-}
+// function logMQTT({ timestamp, identificador, status }) {
+//   const mensagensDiv = document.getElementById('mensagens-mqtt');
+//   const nova = document.createElement('div');
+//   nova.innerText = `[${timestamp}] ${identificador}: ${status}`;
+//   mensagensDiv.prepend(nova);
+// }
 
 function enviarSP() {
   
