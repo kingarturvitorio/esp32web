@@ -16,9 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from django.conf import settings
 from django.conf.urls.static import static
+
+# 1) importe seu ViewSet
+from esp32mqtt.views import MedicaoViewSet
+
+# 2) configure o router
+router = DefaultRouter()
+router.register(r'medicoes', MedicaoViewSet, basename='medicao')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +36,7 @@ urlpatterns = [
     path('', include('esp32mqtt.urls')),
     path('', include('usuarios.urls')),
     path('', include('dashboard.urls')),
+    path('api/', include(router.urls)),
 
 ]
 

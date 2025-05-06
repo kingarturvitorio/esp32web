@@ -1,7 +1,6 @@
 from django.urls import path
 from . import views
 
-
 urlpatterns = [
     path('listar_dispositivos/', views.DispositivoListView.as_view(), name='lista-dispositivos'),
     path('sistema_monitoramento/', views.SistemaMonitoramentoView.as_view(), name='sistema-monitoramento'),
@@ -12,4 +11,6 @@ urlpatterns = [
 
     ##rota para ser atualizada dinamicamente via ajax
     path("api/status-dispositivos/", views.status_dispositivos, name="status-dispositivos"),
+        # SSE (opcional) para atualizações live
+    path('events/esp32/', views.esp32_events, name='esp32-events'),
 ]

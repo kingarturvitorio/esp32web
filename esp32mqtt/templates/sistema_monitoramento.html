@@ -8,8 +8,7 @@
     <h3 class="display-4">Editar Paciente</h3>
     <div class="card">
         <div class="card-body">
-
-            <button id="btn-setpoint">Setar Setpoint</button>
+            <button id="btn-setpoint" class="btn btn-secondary mt-3">Setar Setpoint</button>
             <input type="number" id="input-sp" />
 
             <hr>
@@ -50,6 +49,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="col-md-3">
                     <div class="card border-info mb-3">
                         <div class="card-header">⚙️ Temp Termistor</div>
@@ -58,17 +58,29 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card border-info mb-3">
-                    <div class="card-header">⚙️ Error</div>
-                    <div class="card-body text-info">
-                        <h5 class="card-title" id="card-erro">--</h5>
+                <div class="col-md-3">
+                    <div class="card border-info mb-3">
+                        <div class="card-header">⚙️ Error</div>
+                        <div class="card-body text-info">
+                            <h5 class="card-title" id="card-erro">--</h5>
+                        </div>
                     </div>
                 </div>
             </div>
+
             </ul>
         </div>
+
+        <h2>Temperatura em Tempo Real</h2>
+        <canvas id="chart-temperature" width="600" height="300"></canvas>
+        <div>
+            <button type="button" onclick="setTimeRange('1m')">1 minuto</button>
+            <button type="button" onclick="setTimeRange('15m')">15 min</button>
+            <button type="button" onclick="setTimeRange('1h')">1 hora</button>
+            <button type="button" onclick="setTimeRange('1d')">1 dia</button>
+            <button type="button" onclick="setTimeRange('1M')">1 mês</button>
+            <button type="button" onclick="setTimeRange(null)">Tudo</button>
+          </div>
     </div>
 </div>
 

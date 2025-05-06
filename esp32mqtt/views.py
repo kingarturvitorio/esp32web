@@ -1,10 +1,16 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from . models import Dispositivo
+from . models import Dispositivo, Medicao
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
+from .serializers import MedicaoSerializer
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.utils.dateparse import parse_datetime
+from django.http import StreamingHttpResponse
 
 class DispositivoCreateView(LoginRequiredMixin, CreateView):
     model = Dispositivo
@@ -53,3 +59,33 @@ def status_dispositivos(request):
 class SistemaMonitoramentoView(LoginRequiredMixin, ListView):
     model = Dispositivo
     template_name = 'sistema_monitoramento.html'
+
+class MedicaoViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Medicao.objects.all().order_by('timestamp')
+    serializer_class = MedicaoSerializer
+
+    @action(detail=False, methods=['get'])
+    def historico(self, request):
+        # espera query params: ?tipo=temp_termistor&from=...&to=...
+        tipo = request.query_params.get('tipo')
+        since = parse_datetime(request.query_params.get('from'))
+        until = parse_datetime(request.query_params.get('to'))
+
+        qs = self.queryset
+        if tipo:
+            qs = qs.filter(tipo=tipo)
+        if since:
+            qs = qs.filter(timestamp__gte=since)
+        if until:
+            qs = qs.filter(timestamp__lte=until)
+
+        serializer = MedicaoSerializer(qs, many=True)
+        return Response(serializer.data)
+
+def esp32_events(request):
+    def event_stream():
+        # subscribe no Redis ou Channels aqui
+        while True:
+            msg = redis_client.blpop('esp32_status')[1]
+            yield f"data: {msg.decode()}\n\n"
+    return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
