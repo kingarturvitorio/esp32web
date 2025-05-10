@@ -26,7 +26,7 @@ from channels_redis.core import RedisChannelLayer
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 
 # Carrega variáveis de ambiente (você pode usar python-dotenv ou definir no seu shell)
-INFLUX_URL    = "http://18.117.46.69:8086"     # ex: https://meu-influx.aws.com
+INFLUX_URL    = "http://18.117.46.69"     # ex: https://meu-influx.aws.com
 INFLUX_TOKEN  = "ibPbxd-wNhLzfZBjMAAxXUJ-Do2HZDQxWLaGC28I-csL2LdLlSjhUl_iE7s2DPDXAK6v2nT0i8OPnKfd_mjOCw=="   # token com permissão de escrita
 INFLUX_ORG    = "artur"     # nome da sua organização
 INFLUX_BUCKET = "artur_v2"  # nome do bucket
