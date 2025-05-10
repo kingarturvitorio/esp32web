@@ -8,7 +8,8 @@ import redis
 import paho.mqtt.client as mqtt
 from django.utils import timezone
 from asgiref.sync import async_to_sync
-
+import logging
+logger = logging.getLogger(__name__)
 # --- 1) CONFIGURAÇÃO DO DJANGO ---
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
@@ -97,8 +98,16 @@ def on_message(client, userdata, msg):
                 .field("valor", valor_float)
                 .time(timestamp, WritePrecision.NS)
             )
-            write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=p)
-            print("→ Escrita InfluxDB:", p.to_line_protocol())
+            try:
+                write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=p)
+                print("→ Escrita InfluxDB:", p.to_line_protocol())
+            except write_api.exceptions.ApiError as e:
+                    if e.status == 404:
+                        logger.error("Erro InfluxDB 404: verifique bucket/endereço")
+                        # talvez só logar UMA vez, ou usar backoff/retry
+                    else:
+                        logger.exception("Erro InfluxDB inesperado")
+
 
         # 5.3) ENVIA via Channels → WebSocket
         async_to_sync(channel_layer.group_send)(
