@@ -26,7 +26,7 @@ from channels_redis.core import RedisChannelLayer
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 
 # Carrega variáveis de ambiente (você pode usar python-dotenv ou definir no seu shell)
-INFLUX_URL    = "http://18.117.46.69"     # ex: https://meu-influx.aws.com
+INFLUX_URL    = "http://18.117.46.69:8086"     # ex: https://meu-influx.aws.com
 INFLUX_TOKEN  = "ibPbxd-wNhLzfZBjMAAxXUJ-Do2HZDQxWLaGC28I-csL2LdLlSjhUl_iE7s2DPDXAK6v2nT0i8OPnKfd_mjOCw=="   # token com permissão de escrita
 INFLUX_ORG    = "artur"     # nome da sua organização
 INFLUX_BUCKET = "artur_v2"  # nome do bucket
@@ -62,7 +62,7 @@ def redis_listener():
                 client.publish('setpoint', str(comando["valor"]))
             # ▶️ adicione outros comandos aqui…
         except Exception as e:
-            print("❌ Erro ao processar comando no Redis:", e)
+            logger.exception("Erro no redis")
 
 # --- 5) CALLBACKS MQTT ---
 def on_connect(client, userdata, flags, rc):
@@ -108,10 +108,9 @@ def on_message(client, userdata, msg):
                 #print("→ Escrita InfluxDB:", p.to_line_protocol())
             except write_api.exceptions.ApiError as e:
                     if e.status == 404:
-                        logger.error("Erro InfluxDB 404: verifique bucket/endereço")
-                        # talvez só logar UMA vez, ou usar backoff/retry
+                        logger.warning("InfluxDB retornou 404: URL ou bucket inválido")
                     else:
-                        logger.exception("Erro InfluxDB inesperado")
+                        logger.error("Erro InfluxDB inesperado: %s", e)
 
 
         # 5.3) ENVIA via Channels → WebSocket
@@ -144,5 +143,4 @@ client.connect("18.117.46.69", 1883, 60)
 # Inicia thread para comandos Redis
 threading.Thread(target=redis_listener, daemon=True).start()
 
-print("🔄 Aguardando mensagens MQTT…")
 client.loop_forever()
