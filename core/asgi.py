@@ -14,11 +14,14 @@ import esp32mqtt.routing
 
 django.setup()
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+
 application = ProtocolTypeRouter({
-    "http": django_asgi_app,
-    "websocket": AuthMiddlewareStack(
-        URLRouter(
-            esp32mqtt.routing.websocket_urlpatterns
-        )
+    # qualquer requisição HTTP vai para o Django normal
+    "http": get_asgi_application(),
+
+    # só as websockets são roteadas por Channels
+    "websocket": URLRouter(
+        esp32mqtt.routing.websocket_urlpatterns
     ),
 })
