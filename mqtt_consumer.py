@@ -8,8 +8,13 @@ import redis
 import paho.mqtt.client as mqtt
 from django.utils import timezone
 from asgiref.sync import async_to_sync
+import logging.config
+from django.conf import settings
+# carrega o dict LOGGING do settings.py
+logging.config.dictConfig(settings.LOGGING)
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('mqtt_consumer')
+
 # --- 1) CONFIGURAÇÃO DO DJANGO ---
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
@@ -43,13 +48,13 @@ channel_layer = RedisChannelLayer(hosts=[("127.0.0.1", 6379)])
 # --- 4) FUNÇÃO PARA ESCUTAR COMANDOS via Redis ---
 def redis_listener():
     pubsub.subscribe("comandos_esp32")
-    print("📡 Escutando comandos no canal Redis 'comandos_esp32'…")
+    #print("📡 Escutando comandos no canal Redis 'comandos_esp32'…")
     for msg in pubsub.listen():
         if msg["type"] != "message":
             continue
         try:
             comando = json.loads(msg["data"].decode())
-            print("🟨 Comando recebido:", comando)
+            #print("🟨 Comando recebido:", comando)
 
             # Exemplo de aplicação do comando no MQTT
             identificador = comando.get("identificador")  # adapte se precisar
@@ -61,7 +66,7 @@ def redis_listener():
 
 # --- 5) CALLBACKS MQTT ---
 def on_connect(client, userdata, flags, rc):
-    print("🟢 Conectado ao MQTT (rc=%s)" % rc)
+    logger.info("Conectado ao MQTT (rc=%s)", rc)
     client.subscribe("esp32/#")  # escuta todos tópicos esp32/
 
 def on_message(client, userdata, msg):
@@ -100,7 +105,7 @@ def on_message(client, userdata, msg):
             )
             try:
                 write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=p)
-                print("→ Escrita InfluxDB:", p.to_line_protocol())
+                #print("→ Escrita InfluxDB:", p.to_line_protocol())
             except write_api.exceptions.ApiError as e:
                     if e.status == 404:
                         logger.error("Erro InfluxDB 404: verifique bucket/endereço")
@@ -123,10 +128,10 @@ def on_message(client, userdata, msg):
                 }
             }
         )
-        print(f"📡 Publicado WS e Influx: {identificador} | {tipo_dado} = {valor_str}")
+        logger.info("Processou mensagem: %s/%s = %s", identificador, tipo_dado, valor_str)
 
     except Exception as e:
-        print("❌ Erro no on_message:", e)
+        logger.exception("Erro no on_message")
 
 # --- 6) CONFIGURA E INICIA MQTT CLIENT ---
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
