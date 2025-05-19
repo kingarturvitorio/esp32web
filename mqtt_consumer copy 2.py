@@ -9,28 +9,26 @@ import paho.mqtt.client as mqtt
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 import logging.config
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-django.setup()
 from django.conf import settings
 # carrega o dict LOGGING do settings.py
 logging.config.dictConfig(settings.LOGGING)
 import logging
 logger = logging.getLogger('mqtt_consumer')
 # --- 1) CONFIGURAÇÃO DO DJANGO ---
-from influxdb_client.rest import ApiException
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+django.setup()
 
 from esp32mqtt.models import Dispositivo, Medicao
-from controle_acesso.models import Cartao, EventoAcesso
 from channels_redis.core import RedisChannelLayer
 
 # --- 2) DEPENDÊNCIAS INFLUXDB ---
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 
 # Carrega variáveis de ambiente (você pode usar python-dotenv ou definir no seu shell)
-INFLUX_URL    = "http://18.117.46.69:8086"     # ex: https://meu-influx.aws.com
+INFLUX_URL    = "http://18.117.46.69"     # ex: https://meu-influx.aws.com
 INFLUX_TOKEN  = "ibPbxd-wNhLzfZBjMAAxXUJ-Do2HZDQxWLaGC28I-csL2LdLlSjhUl_iE7s2DPDXAK6v2nT0i8OPnKfd_mjOCw=="   # token com permissão de escrita
 INFLUX_ORG    = "artur"     # nome da sua organização
-INFLUX_BUCKET = "artur_v3"  # nome do bucket
+INFLUX_BUCKET = "artur_v2"  # nome do bucket
 
 # Inicializa client Influx
 influx_client = InfluxDBClient(
@@ -72,85 +70,67 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     try:
-        parts         = msg.topic.split('/')
+        parts = msg.topic.split('/')
         identificador = parts[1]
         tipo_dado     = parts[2]
-        payload       = msg.payload.decode()
+        valor_str     = msg.payload.decode()
         timestamp     = timezone.now()
 
-        # 1) Atualiza ping do dispositivo
+        # 5.1) ATUALIZAÇÃO no Django
         disp = Dispositivo.objects.get(identificador=identificador)
         disp.ultimo_ping = timestamp
         disp.save()
 
-        if tipo_dado == 'rfid':
-            # ── lida com RFID ──
-            try:
-                cartao = Cartao.objects.get(uid=payload, ativo=True)
-                autorizado = True
-            except Cartao.DoesNotExist:
-                cartao = None
-                autorizado = False
-
-            EventoAcesso.objects.create(
-                cartao      = cartao,
-                dispositivo = identificador,
-                autorizado  = autorizado
+        try:
+            valor_float = float(valor_str)
+            Medicao.objects.create(
+                dispositivo=disp,
+                tipo=tipo_dado,
+                valor=valor_float,
+                timestamp=timestamp
             )
+        except ValueError:
+            # Se não for float, ignora criação de Medicao
+            valor_float = None
 
-            # Resposta ao ESP32
-            topic_resp = f'esp32/{identificador}/rfid/resp'
-            client.publish(topic_resp, json.dumps({
-                "autorizado": autorizado,
-                "timestamp": timestamp.isoformat()
-            }).encode())
-
-        else:
-            # ── lida com sensores numéricos ──
+        # 5.2) ESCREVE no InfluxDB (só se for numérico)
+        if valor_float is not None:
+            p = (
+                Point("medicao")
+                .tag("dispositivo", identificador)
+                .tag("tipo", tipo_dado)
+                .field("valor", valor_float)
+                .time(timestamp, WritePrecision.NS)
+            )
             try:
-                valor_float = float(payload)
-
-                # 2.1) grava no Django
-                Medicao.objects.create(
-                    dispositivo=disp,
-                    tipo       = tipo_dado,
-                    valor      = valor_float,
-                    timestamp  = timestamp
-                )
-
-                # 2.2) envia para o InfluxDB
-                p = (
-                    Point("medicao")
-                    .tag("dispositivo", identificador)
-                    .tag("tipo",        tipo_dado)
-                    .field("valor",      valor_float)
-                    .time(timestamp, WritePrecision.NS)
-                )
                 write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=p)
-            except ApiException as e:
-                print("⚠️ Erro ao escrever no InfluxDB:")
-                print(e.body)  # Isso mostra o corpo HTML de erro detalhado
+                print("→ Escrita InfluxDB:", p.to_line_protocol())
+            except write_api.exceptions.ApiError as e:
+                    if e.status == 404:
+                        logger.error("Erro InfluxDB 404: verifique bucket/endereço")
+                        # talvez só logar UMA vez, ou usar backoff/retry
+                    else:
+                        logger.exception("Erro InfluxDB inesperado")
 
-            except ValueError:
-                # não era número, ignora
-                pass
 
-        # 3) broadcast via Channels (usa async_to_sync)
+        # 5.3) ENVIA via Channels → WebSocket
         async_to_sync(channel_layer.group_send)(
             "esp32_status",
             {
                 "type": "send_status",
                 "data": {
                     "identificador": identificador,
-                    "tipo":          tipo_dado,
-                    "valor":         payload,
-                    "timestamp":     timestamp.isoformat()
+                    "tipo": tipo_dado,
+                    "valor": valor_str,
+                    "status": "online",
+                    "timestamp": timestamp.isoformat()
                 }
             }
         )
+        print(f"📡 Publicado WS e Influx: {identificador} | {tipo_dado} = {valor_str}")
 
-    except Exception:
-        logger.exception("Erro no on_message")
+    except Exception as e:
+        print("❌ Erro no on_message:", e)
 
 # --- 6) CONFIGURA E INICIA MQTT CLIENT ---
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)

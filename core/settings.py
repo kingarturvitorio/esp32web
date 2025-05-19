@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'esp32mqtt',
     'usuarios',
     'django_cleanup',
-    'dashboard'
+    'dashboard',
+    'controle_acesso',
 ]
 
 #crispy forms

@@ -36,6 +36,7 @@ urlpatterns = [
     path('', include('esp32mqtt.urls')),
     path('', include('usuarios.urls')),
     path('', include('dashboard.urls')),
+    path('', include('controle_acesso.urls')),
     path('api/', include(router.urls)),
 
 ]
