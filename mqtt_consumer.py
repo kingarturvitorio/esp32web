@@ -41,7 +41,13 @@ influx_client = InfluxDBClient(
 write_api = influx_client.write_api()
 
 # --- 3) CONFIGURAÇÃO REDIS / CHANNEL LAYER ---
-redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+
+# --- 3) CONFIGURAÇÃO REDIS / CHANNEL LAYER ---
+redis_client = redis.StrictRedis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=settings.REDIS_DB
+)
 pubsub      = redis_client.pubsub()
 
 channel_layer = RedisChannelLayer(hosts=[("127.0.0.1", 6379)])
@@ -71,6 +77,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("esp32/#")  # escuta todos tópicos esp32/
 
 def on_message(client, userdata, msg):
+    print(f"💬 Mensagem recebida no MQTT — tópico: {msg.topic}, payload: {msg.payload}")
     try:
         parts         = msg.topic.split('/')
         identificador = parts[1]

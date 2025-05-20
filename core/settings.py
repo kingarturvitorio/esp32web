@@ -197,3 +197,8 @@ LOGGING = {
         },
     },
 }
+
+# Redis (usado por mqtt_consumer.py e pelo seu app controle_acesso)
+REDIS_HOST = "127.0.0.1"
+REDIS_PORT = 6379
+REDIS_DB   = 0

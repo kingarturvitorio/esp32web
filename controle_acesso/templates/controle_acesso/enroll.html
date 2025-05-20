@@ -1,0 +1,37 @@
+
+{% block content %}
+<h1>Enrolar Novo Cartão RFID</h1>
+
+<p>UID lido: <strong id="uid">nenhum</strong></p>
+<label>Usuário: <input id="username" /></label>
+<button id="btn-enroll">Cadastrar Cartão</button>
+<pre id="status"></pre>
+
+<script>
+  const ws = new WebSocket(
+    (location.protocol==="https:"?"wss":"ws")
+    + "://"+location.host+"/ws/esp32/status/"
+  );
+  ws.onmessage = e => {
+    const d = JSON.parse(e.data);
+    if (d.tipo === "rfid") {
+      document.getElementById("uid").textContent = d.valor;
+    }
+  };
+
+  document.getElementById("btn-enroll").onclick = async () => {
+    const uid = document.getElementById("uid").textContent;
+    const username = document.getElementById("username").value;
+    const resp = await fetch("{% url 'controle_acesso:enroll_card' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ uid, username })
+    });
+    const j = await resp.json();
+    document.getElementById("status").textContent = JSON.stringify(j, null, 2);
+  };
+</script>
+{% endblock %}

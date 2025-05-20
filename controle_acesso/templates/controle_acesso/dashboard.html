@@ -1,0 +1,61 @@
+
+{% block content %}
+<h1>Dashboard de Controle de Acesso</h1>
+
+<div>
+  <label>Dispositivo: 
+    <select id="device-select">
+      {% for d in dispositivos %}
+        <option value="{{ d.identificador }}">{{ d.identificador }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button onclick="openLock()">Abrir Tranca</button>
+</div>
+
+<table id="events-table" border="1" cellpadding="4">
+  <thead>
+    <tr><th>Data/Hora</th><th>Dispositivo</th><th>Cartão</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for ev in eventos %}
+    <tr>
+      <td>{{ ev.timestamp }}</td>
+      <td>{{ ev.dispositivo }}</td>
+      <td>{{ ev.cartao }}</td>
+      <td>{{ ev.autorizado|yesno:"OK,NEGADO" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  const ws = new WebSocket(
+    (location.protocol==="https:"?"wss":"ws")
+    + "://"+location.host+"/ws/esp32/status/"
+  );
+  ws.onmessage = e => {
+    const d = JSON.parse(e.data);
+    // só processa RFID
+    if (d.tipo === "rfid") {
+      const tb = document.getElementById("events-table").querySelector("tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${d.timestamp}</td>
+        <td>${d.dispositivo}</td>
+        <td>${d.valor}</td>
+        <td>${d.autorizado? "OK":"NEGADO"}</td>
+      `;
+      tb.insertBefore(tr, tb.firstChild);
+    }
+  };
+
+  function openLock(){
+    const id = document.getElementById("device-select").value;
+    ws.send(JSON.stringify({
+      comando: "open_lock",
+      identificador: id
+    }));
+  }
+</script>
+{% endblock %}
