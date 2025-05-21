@@ -80,7 +80,7 @@ def on_message(client, userdata, msg):
     
     topic = msg.topic
     # 0) Ignore suas próprias respostas:
-    if topic.endswith("/rfid/resp"):
+    if topic.endswith("/atuadores/2"):
         return
     
     print(f"💬 Mensagem recebida no MQTT — tópico: {msg.topic}, payload: {msg.payload}")
