@@ -1,0 +1,27 @@
+{% block content %}
+<h1>Filtrar Eventos de Acesso</h1>
+
+<form method="get" class="form-inline mb-3">
+  <input name="uid" placeholder="UID do cartão" value="{{ request.GET.uid }}" class="form-control mr-2">
+  <input name="usuario" placeholder="Usuário" value="{{ request.GET.usuario }}" class="form-control mr-2">
+  <input name="dispositivo" placeholder="Dispositivo" value="{{ request.GET.dispositivo }}" class="form-control mr-2">
+  <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<table class="table">
+  <thead><tr><th>Timestamp</th><th>Cartão</th><th>Usuário</th><th>Dispositivo</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for ev in eventos %}
+    <tr>
+      <td>{{ ev.timestamp }}</td>
+      <td>{{ ev.cartao.uid }}</td>
+      <td>{{ ev.cartao.usuario.username }}</td>
+      <td>{{ ev.dispositivo }}</td>
+      <td>{{ ev.autorizado|yesno:"OK,NEGADO" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Nenhum evento encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

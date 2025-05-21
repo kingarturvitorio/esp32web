@@ -1,0 +1,9 @@
+{% block content %}
+<h1>Excluir Evento</h1>
+<p>Tem certeza que deseja excluir o evento em <strong>{{ object.timestamp }}</strong>?</p>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+  <a href="{% url 'controle_acesso:evento_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

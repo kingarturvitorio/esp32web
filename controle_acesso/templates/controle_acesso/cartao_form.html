@@ -1,0 +1,52 @@
+{% load static %}
+
+{% block content %}
+  <h1>{% if object %}Editar Cartão{% else %}Novo Cartão{% endif %}</h1>
+  
+  <!-- Banner informativo -->
+  <div style="
+      background: #e0f3ff;
+      border: 1px solid #99d;
+      padding: 1em;
+      margin-bottom: 1.5em;
+      font-size: 1.2em;
+      text-align: center;
+    ">
+    <strong>Aproxime seu cartão do leitor RFID</strong><br>
+    O UID aparecerá automaticamente neste campo abaixo.
+  </div>
+
+  {# 1) Especifique explicitamente a URL de destino #}
+  <form method="post" 
+        action="{% if object %}{% url 'controle_acesso:cartao_edit' object.pk %}{% else %}{% url 'controle_acesso:cartao_add' %}{% endif %}">
+    {% csrf_token %}
+
+    {# 2) Mostre erros gerais e de campo, se houverem #}
+    {{ form.non_field_errors }}
+    <div class="form-group">
+      <label for="id_uid">UID do Cartão</label><br>
+      <input type="text"
+             id="id_uid"
+             name="uid"
+             value="{{ form.uid.value|default:'' }}"
+             readonly
+             class="form-control"/>
+      {{ form.uid.errors }}
+    </div>
+    <div>
+      {{ form.usuario.errors }}
+      <label for="id_usuario">Usuário</label><br>
+      {{ form.usuario }}
+    </div>
+    <div>
+      {{ form.ativo.errors }}
+      <label for="id_ativo">Ativo</label><br>
+      {{ form.ativo }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="{% url 'controle_acesso:cartao_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+
+  <script src="{% static 'js/rfid.js' %}"></script>
+{% endblock %}

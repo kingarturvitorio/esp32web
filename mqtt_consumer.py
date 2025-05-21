@@ -77,8 +77,16 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("esp32/#")  # escuta todos tópicos esp32/
 
 def on_message(client, userdata, msg):
+    
+    topic = msg.topic
+    # 0) Ignore suas próprias respostas:
+    if topic.endswith("/rfid/resp"):
+        return
+    
     print(f"💬 Mensagem recebida no MQTT — tópico: {msg.topic}, payload: {msg.payload}")
-    try:
+    
+    
+    try:   
         parts         = msg.topic.split('/')
         identificador = parts[1]
         tipo_dado     = parts[2]
@@ -92,11 +100,16 @@ def on_message(client, userdata, msg):
 
         if tipo_dado == 'rfid':
             # ── lida com RFID ──
+            uid = payload
             try:
-                cartao = Cartao.objects.get(uid=payload, ativo=True)
-                autorizado = True
+                # já traz o usuario para não fazer outra query depois
+                cartao = Cartao.objects.select_related('usuario').get(uid=uid, ativo=True)
+                usuario = cartao.usuario
+                # você pode verificar is_active ou uma permissão específica aqui
+                autorizado = usuario.is_active
             except Cartao.DoesNotExist:
-                cartao = None
+                cartao     = None
+                usuario    = None
                 autorizado = False
 
             EventoAcesso.objects.create(
@@ -106,11 +119,9 @@ def on_message(client, userdata, msg):
             )
 
             # Resposta ao ESP32
-            topic_resp = f'esp32/{identificador}/rfid/resp'
-            client.publish(topic_resp, json.dumps({
-                "autorizado": autorizado,
-                "timestamp": timestamp.isoformat()
-            }).encode())
+            topic_cmd = f'esp32/{identificador}/atuadores/2'
+            payload_cmd = "on" if autorizado else "off"
+            client.publish(topic_cmd, payload_cmd)
 
         else:
             # ── lida com sensores numéricos ──

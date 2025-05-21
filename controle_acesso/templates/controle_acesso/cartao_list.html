@@ -1,0 +1,24 @@
+{% block content %}
+<h1>Cartões RFID</h1>
+<a href="{% url 'controle_acesso:cartao_add' %}?uid={{ request.GET.uid }}">+ Novo Cartão </a>
+<table>
+  <thead>
+    <tr><th>UID</th><th>Usuário</th><th>Ativo</th><th>Ações</th></tr>
+  </thead>
+  <tbody>
+    {% for cartao in cartoes %}
+    <tr>
+      <td>{{ cartao.uid }}</td>
+      <td>{{ cartao.usuario }}</td>
+      <td>{{ cartao.ativo }}</td>
+      <td>
+        <a href="{% url 'controle_acesso:cartao_edit' cartao.pk %}">Editar</a>
+        <a href="{% url 'controle_acesso:cartao_delete' cartao.pk %}">Excluir</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Nenhum cartão cadastrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

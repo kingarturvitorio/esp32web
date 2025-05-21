@@ -60,26 +60,73 @@ class SistemaMonitoramentoView(LoginRequiredMixin, ListView):
     model = Dispositivo
     template_name = 'sistema_monitoramento.html'
 
+# class MedicaoViewSet(viewsets.ReadOnlyModelViewSet):
+#     queryset = Medicao.objects.all().order_by('timestamp')
+#     serializer_class = MedicaoSerializer
+
+#     @action(detail=False, methods=['get'])
+#     def historico(self, request):
+#         # espera query params: ?tipo=temp_termistor&from=...&to=...
+#         tipo = request.query_params.get('tipo')
+#         since = parse_datetime(request.query_params.get('from'))
+#         until = parse_datetime(request.query_params.get('to'))
+
+#         qs = self.queryset
+#         if tipo:
+#             qs = qs.filter(tipo=tipo)
+#         if since:
+#             qs = qs.filter(timestamp__gte=since)
+#         if until:
+#             qs = qs.filter(timestamp__lte=until)
+
+#         serializer = MedicaoSerializer(qs, many=True)
+#         return Response(serializer.data)
+
 class MedicaoViewSet(viewsets.ReadOnlyModelViewSet):
+    ##fiz dessa forma para tratar os dados que chegam no frontend para não carregar tudo de uma vez
+    # e sobrecarregar para o usuário, sendo assim, só mostra o periodo de tempo informado e os
+    # dados carregam mais rapidamente.
     queryset = Medicao.objects.all().order_by('timestamp')
     serializer_class = MedicaoSerializer
 
+    def _parse_iso(self, s):
+        """
+        Corrige o 'Z' final para '+00:00' (UTC) antes de usar parse_datetime.
+        Retorna None se parse_datetime falhar.
+        """
+        if not s:
+            return None
+        # Exemplo de entrada: '2025-05-20T14:00:00.000Z'
+        if s.endswith('Z'):
+            # transforma em '2025-05-20T14:00:00.000+00:00'
+            s = s[:-1] + '+00:00'
+        return parse_datetime(s)
+
     @action(detail=False, methods=['get'])
     def historico(self, request):
-        # espera query params: ?tipo=temp_termistor&from=...&to=...
-        tipo = request.query_params.get('tipo')
-        since = parse_datetime(request.query_params.get('from'))
-        until = parse_datetime(request.query_params.get('to'))
+        tipo  = request.query_params.get('tipo')
+        raw_f = request.query_params.get('from')
+        raw_t = request.query_params.get('to')
+
+        since = self._parse_iso(raw_f)
+        until = self._parse_iso(raw_t)
 
         qs = self.queryset
         if tipo:
             qs = qs.filter(tipo=tipo)
+
         if since:
             qs = qs.filter(timestamp__gte=since)
         if until:
             qs = qs.filter(timestamp__lte=until)
 
-        serializer = MedicaoSerializer(qs, many=True)
+        # opcional: paginação automática, para não trazer tudo de uma vez
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
 def esp32_events(request):

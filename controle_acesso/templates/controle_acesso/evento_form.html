@@ -1,0 +1,24 @@
+{% block content %}
+<h1>{% if object %}Editar Evento{% else %}Novo Evento{% endif %}</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div>
+    {{ form.cartao.errors }}
+    <label for="id_cartao">Cartão</label><br>
+    {{ form.cartao }}
+  </div>
+  <div>
+    {{ form.dispositivo.errors }}
+    <label for="id_dispositivo">Dispositivo</label><br>
+    {{ form.dispositivo }}
+  </div>
+  <div>
+    {{ form.autorizado.errors }}
+    <label for="id_autorizado">Autorizado</label><br>
+    {{ form.autorizado }}
+  </div>
+  <button type="submit" class="btn btn-primary">Salvar</button>
+  <a href="{% url 'controle_acesso:evento_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

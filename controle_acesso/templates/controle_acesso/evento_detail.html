@@ -1,0 +1,11 @@
+{% block content %}
+<h1>Detalhes do Evento</h1>
+<ul>
+  <li><strong>ID:</strong> {{ evento.pk }}</li>
+  <li><strong>Timestamp:</strong> {{ evento.timestamp }}</li>
+  <li><strong>Cartão:</strong> {{ evento.cartao }}</li>
+  <li><strong>Dispositivo:</strong> {{ evento.dispositivo }}</li>
+  <li><strong>Status:</strong> {{ evento.autorizado|yesno:"Autorizado,Negado" }}</li>
+</ul>
+<a href="{% url 'controle_acesso:evento_list' %}">Voltar à lista</a>
+{% endblock %}

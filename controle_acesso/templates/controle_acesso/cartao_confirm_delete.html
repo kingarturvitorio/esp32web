@@ -1,0 +1,9 @@
+{% block content %}
+<h1>Excluir Cartão</h1>
+<p>Tem certeza que deseja excluir o cartão <strong>{{ object.uid }}</strong>?</p>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Confirmar Exclusão</button>
+  <a href="{% url 'controle_acesso:cartao_list' %}">Cancelar</a>
+</form>
+{% endblock %}

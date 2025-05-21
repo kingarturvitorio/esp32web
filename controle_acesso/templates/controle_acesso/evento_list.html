@@ -1,0 +1,26 @@
+{% block content %}
+<h1>Histórico de Acessos</h1>
+<a href="{% url 'controle_acesso:evento_add' %}" class="btn btn-primary">+ Novo Evento</a>
+<table class="table">
+  <thead>
+    <tr><th>Data/Hora</th><th>Cartão</th><th>Dispositivo</th><th>Status</th><th>Ações</th></tr>
+  </thead>
+  <tbody>
+    {% for ev in eventos %}
+    <tr>
+      <td>{{ ev.timestamp }}</td>
+      <td>{{ ev.cartao }}</td>
+      <td>{{ ev.dispositivo }}</td>
+      <td>{{ ev.autorizado|yesno:"Autorizado,Negado" }}</td>
+      <td>
+        <a href="{% url 'controle_acesso:evento_detail' ev.pk %}">Ver</a> |
+        <a href="{% url 'controle_acesso:evento_edit' ev.pk %}">Editar</a> |
+        <a href="{% url 'controle_acesso:evento_delete' ev.pk %}">Excluir</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Nenhum evento registrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
