@@ -1,52 +1,62 @@
-{% load static %}
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
 
+{% load static %}
 {% block content %}
-  <h1>{% if object %}Editar Cartão{% else %}Novo Cartão{% endif %}</h1>
-  
-  <!-- Banner informativo -->
-  <div style="
-      background: #e0f3ff;
-      border: 1px solid #99d;
-      padding: 1em;
-      margin-bottom: 1.5em;
-      font-size: 1.2em;
-      text-align: center;
-    ">
-    <strong>Aproxime seu cartão do leitor RFID</strong><br>
-    O UID aparecerá automaticamente neste campo abaixo.
+<div class="mt-4">
+
+  <!-- Título -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="h3 fw-bold">
+      <i class="bi bi-person-vcard me-2 text-primary"></i>
+      {% if object %}Editar Cartão{% else %}Cadastrar Cartão{% endif %}
+    </h1>
   </div>
 
-  {# 1) Especifique explicitamente a URL de destino #}
-  <form method="post" 
-        action="{% if object %}{% url 'controle_acesso:cartao_edit' object.pk %}{% else %}{% url 'controle_acesso:cartao_add' %}{% endif %}">
-    {% csrf_token %}
+  <!-- Banner informativo -->
+  <div class="alert alert-info text-center fw-semibold mb-4">
+    <strong>Aproxime seu cartão do leitor RFID.</strong><br>
+    O UID aparecerá automaticamente no campo abaixo.
+  </div>
 
-    {# 2) Mostre erros gerais e de campo, se houverem #}
-    {{ form.non_field_errors }}
-    <div class="form-group">
-      <label for="id_uid">UID do Cartão</label><br>
-      <input type="text"
-             id="id_uid"
-             name="uid"
-             value="{{ form.uid.value|default:'' }}"
-             readonly
-             class="form-control"/>
-      {{ form.uid.errors }}
-    </div>
-    <div>
-      {{ form.usuario.errors }}
-      <label for="id_usuario">Usuário</label><br>
-      {{ form.usuario }}
-    </div>
-    <div>
-      {{ form.ativo.errors }}
-      <label for="id_ativo">Ativo</label><br>
-      {{ form.ativo }}
-    </div>
+  <!-- Formulário -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" 
+            action="{% if object %}{% url 'controle_acesso:cartao_edit' object.pk %}{% else %}{% url 'controle_acesso:cartao_add' %}{% endif %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
 
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a href="{% url 'controle_acesso:cartao_list' %}" class="btn btn-secondary">Cancelar</a>
-  </form>
+        <div class="mb-3">
+          <label for="id_uid" class="form-label">UID do Cartão</label>
+          <input type="text" id="id_uid" name="uid" value="{{ form.uid.value|default:'' }}" readonly class="form-control">
+          {{ form.uid.errors }}
+        </div>
 
-  <script src="{% static 'js/rfid.js' %}"></script>
+        <div class="mb-3">
+          <label for="id_usuario" class="form-label">Usuário</label>
+          {{ form.usuario|add_class:"form-select" }}
+          {{ form.usuario.errors }}
+        </div>
+
+        <div class="mb-4">
+          <label for="id_ativo" class="form-label">Ativo</label>
+          {{ form.ativo|add_class:"form-check-input ms-2" }}
+          {{ form.ativo.errors }}
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Salvar</button>
+          <a href="{% url 'controle_acesso:cartao_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- RFID script -->
+<script src="{% static 'js/rfid.js' %}"></script>
 {% endblock %}

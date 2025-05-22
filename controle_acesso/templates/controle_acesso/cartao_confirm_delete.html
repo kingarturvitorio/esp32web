@@ -1,9 +1,40 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+
 {% block content %}
-<h1>Excluir Cartão</h1>
-<p>Tem certeza que deseja excluir o cartão <strong>{{ object.uid }}</strong>?</p>
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">Confirmar Exclusão</button>
-  <a href="{% url 'controle_acesso:cartao_list' %}">Cancelar</a>
-</form>
+<div class="mt-4">
+
+  <!-- Título com ícone -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="h3 fw-bold text-danger">
+      <i class="bi bi-trash3 me-2"></i> Excluir Cartão
+    </h1>
+  </div>
+
+  <!-- Card de confirmação -->
+  <div class="card shadow-sm border-danger">
+    <div class="card-body">
+
+      <div class="alert alert-warning mb-4">
+        Tem certeza que deseja excluir o cartão <strong>{{ object.uid }}</strong>?<br>
+        <small class="text-muted">Essa ação não poderá ser desfeita.</small>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Confirmar Exclusão
+          </button>
+          <a href="{% url 'controle_acesso:cartao_list' %}" class="btn btn-secondary">
+            Cancelar
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
 {% endblock %}

@@ -1,27 +1,73 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-<h1>Filtrar Eventos de Acesso</h1>
+<div class="mt-4">
 
-<form method="get" class="form-inline mb-3">
-  <input name="uid" placeholder="UID do cartão" value="{{ request.GET.uid }}" class="form-control mr-2">
-  <input name="usuario" placeholder="Usuário" value="{{ request.GET.usuario }}" class="form-control mr-2">
-  <input name="dispositivo" placeholder="Dispositivo" value="{{ request.GET.dispositivo }}" class="form-control mr-2">
-  <button type="submit" class="btn btn-primary">Filtrar</button>
-</form>
+  <!-- Título com ícone -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="h3 fw-bold">
+      <i class="bi bi-door-open me-2 text-primary"></i>
+      Eventos de Acesso
+    </h1>
+  </div>
 
-<table class="table">
-  <thead><tr><th>Timestamp</th><th>Cartão</th><th>Usuário</th><th>Dispositivo</th><th>Status</th></tr></thead>
-  <tbody>
-    {% for ev in eventos %}
-    <tr>
-      <td>{{ ev.timestamp }}</td>
-      <td>{{ ev.cartao.uid }}</td>
-      <td>{{ ev.cartao.usuario.username }}</td>
-      <td>{{ ev.dispositivo }}</td>
-      <td>{{ ev.autorizado|yesno:"OK,NEGADO" }}</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="5">Nenhum evento encontrados.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- Filtros -->
+  <form method="get" class="mb-4">
+    <div class="row g-2">
+      <div class="col-md-3">
+        <input name="uid" placeholder="UID do cartão" value="{{ request.GET.uid }}" class="form-control" />
+      </div>
+      <div class="col-md-3">
+        <input name="usuario" placeholder="Usuário" value="{{ request.GET.usuario }}" class="form-control" />
+      </div>
+      <div class="col-md-3">
+        <input name="dispositivo" placeholder="Dispositivo" value="{{ request.GET.dispositivo }}" class="form-control" />
+      </div>
+      <div class="col-md-3 d-grid">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Tabela -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-striped mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Data/Hora</th>
+            <th>Cartão</th>
+            <th>Usuário</th>
+            <th>Dispositivo</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ev in eventos %}
+            <tr>
+              <td>{{ ev.timestamp }}</td>
+              <td>{{ ev.cartao.uid }}</td>
+              <td>{{ ev.cartao.usuario.username }}</td>
+              <td>{{ ev.dispositivo }}</td>
+              <td>
+                {% if ev.autorizado %}
+                  <span class="badge bg-success">OK</span>
+                {% else %}
+                  <span class="badge bg-danger">NEGADO</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">
+                Nenhum evento encontrado.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}
