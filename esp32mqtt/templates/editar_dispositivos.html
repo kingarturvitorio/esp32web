@@ -1,21 +1,30 @@
 {% extends 'dashboard/base.html' %}
-
-{% block content %}
-
 {% load crispy_forms_tags %}
 
-<div class="conteiner mt-4">
-    <h3 class="display-4">Editar Dispositivo</h3>
-    <div class="card">
-        <div class="card-body">
-            <form method="post" class="form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Salvar Dispositivo</button>
-            </form>
-        </div>
-    </div>
-    <a href="{% url 'lista-dispositivos' %}" class="btn btn-secondary mt-3">Voltar para lista de dispositivos</a>
-</div>
+{% block content %}
+<div class="mt-4">
 
+  <!-- Título com ícone -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="h3 fw-bold">
+      <i class="bi bi-pencil-square me-2 text-primary"></i>
+      Editar Dispositivo
+    </h1>
+  </div>
+
+  <!-- Card do formulário -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">Salvar Dispositivo</button>
+          <a href="{% url 'lista-dispositivos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
 {% endblock %}

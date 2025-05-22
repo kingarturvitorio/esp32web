@@ -1,28 +1,30 @@
 {% extends 'dashboard/base.html' %}
-
-{% block content %}
-
 {% load crispy_forms_tags %}
 
+{% block content %}
+<div class="mt-4">
 
-<div class="container mt=4">
-  <h3 class="display-7">Criar dispositivo</h3>
-
-  <div class="col-md-2">
-    <h2>{{ view.object.pk|yesno:"Editar,Adicionar" }} Dispositivo</h2>
+  <!-- Título e ação -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="h3 fw-bold">
+      <i class="bi bi-plus-circle-fill me-2 text-primary"></i>
+      {{ view.object.pk|yesno:"Editar,Adicionar" }} Dispositivo
+    </h1>
   </div>
 
-  <div class="card">
-      <div class="card-body">
-          <form method="post" class="form">
-              {% csrf_token %}
-              {{ form|crispy }}
-              <button type="submit" class="btn btn-primary">Salvar Dispositivo</button>
-          </form>
-      </div>
+  <!-- Formulário -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">Salvar Dispositivo</button>
+          <a href="{% url 'lista-dispositivos' %}" class="btn btn-secondary">Cancelar e voltar para Lista</a>
+        </div>
+      </form>
+    </div>
   </div>
-  <a href="{% url 'lista-dispositivos' %}" class="btn btn-secondary mt-3">Cancelar e voltar para Lista</a>
+
 </div>
-
-
 {% endblock %}

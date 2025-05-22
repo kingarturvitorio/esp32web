@@ -4,12 +4,19 @@
 
 {% load crispy_forms_tags %}
 
-<div class="conteiner mt-4">
-    <h3 class="display-4">Painel de Variáveis</h3>
+<div class="mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h1 class="h3 fw-bold d-flex align-items-center">
+            <i class="bi bi-bar-chart-fill me-2 text-primary"></i>
+            Painel de Variáveis
+        </h1>
+    </div>
     <div class="card">
         <div class="card-body">
-            <button id="btn-setpoint" class="btn btn-secondary mt-3">Setar Setpoint</button>
-            <input type="number" id="input-sp" />
+            <div class="input-group mb-3 mt-3" style="max-width: 300px;">
+                <button id="btn-setpoint" class="btn btn-secondary">Setar Setpoint</button>
+                <input type="number" id="input-sp" class="form-control" placeholder="Setpoint" />
+            </div>
 
             <hr>
 
@@ -67,22 +74,35 @@
                     </div>
                 </div>
             </div>
-
             </ul>
         </div>
-
-        <h2>Temperatura em Tempo Real</h2>
-        <canvas id="chart-temperature" width="600" height="300"></canvas>
-        <div>
-            <button type="button" onclick="setTimeRange('1m')">1 minuto</button>
-            <button type="button" onclick="setTimeRange('15m')">15 min</button>
-            <button type="button" onclick="setTimeRange('1h')">1 hora</button>
-            <button type="button" onclick="setTimeRange('1d')">1 dia</button>
-            <button type="button" onclick="setTimeRange('1M')">1 mês</button>
-            <button type="button" onclick="setTimeRange(null)">Tudo</button>
-          </div>
     </div>
-</div>
+    <div class="card mt-4">
+        <div class="card-body">
+
+            <!-- Título centralizado -->
+            <h4 class="card-title text-center mb-4">Temperatura em Tempo Real</h4>
+
+            <!-- Botões de tempo -->
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                <button type="button" class="btn btn-outline-secondary" onclick="setTimeRange('1m')">1
+                    minuto</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setTimeRange('15m')">15
+                    min</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setTimeRange('1h')">1 hora</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setTimeRange('1d')">1 dia</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setTimeRange('1M')">1 mês</button>
+                <button type="button" class="btn btn-outline-dark" onclick="setTimeRange(null)">Tudo</button>
+            </div>
+
+            <!-- Canvas do gráfico -->
+            <div class="chart-container">
+                <canvas id="chart-temperature" style="width: 100%; height: 300px;"></canvas>
+            </div>
+
+        </div>
+    </div>
 
 
-{% endblock %}
+
+    {% endblock %}

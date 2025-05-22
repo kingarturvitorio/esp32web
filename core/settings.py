@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_cleanup',
     'dashboard',
     'controle_acesso',
+    'widget_tweaks'
 ]
 
 #crispy forms

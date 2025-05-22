@@ -1,5 +1,19 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white">
-  <div class="container-fluid">
-    <a class="navbar-brand text-black" href="#">Sistema de Gerenciamento prof. Artur</a>
+<nav class="navbar navbar-expand-lg bg-light border-bottom shadow-sm fixed-top">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <a class="navbar-brand fw-bold text-dark" href="#">Sistema de Gerenciamento Prof. Artur</a>
+
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+         id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-person-circle fs-4 me-2"></i>
+        <span>Usuário</span>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+        <li><a class="dropdown-item" href="#">👤 Perfil</a></li>
+        <li><a class="dropdown-item" href="#">🔑 Alterar Senha</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">🚪 Sair</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
