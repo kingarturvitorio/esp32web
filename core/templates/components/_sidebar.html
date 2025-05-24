@@ -1,9 +1,7 @@
-<ul class="nav nav-pills flex-column w-100" id="menu">
-  <!-- Itens principais -->
+<ul class="nav nav-pills flex-column">
   <li class="nav-item">
     <a href="{% url 'homedashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'homedashboard' %}active{% endif %}">
-      <i class="bi bi-calendar4-week me-2"></i>
-      Agendamento
+      <i class="bi bi-calendar4-week me-2"></i> Agendamento
     </a>
   </li>
 

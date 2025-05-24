@@ -7,40 +7,67 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-  <!-- Topbar (Navbar/header fixo) -->
-  {% include 'components/_header.html' %}
+<nav class="navbar navbar-expand-lg bg-light border-bottom shadow-sm fixed-top">
+  <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
+    
+    <!-- Marca com quebra controlada -->
+    <a class="navbar-brand fw-bold text-dark text-truncate me-auto" href="#"
+      style="max-width: 180px; white-space: nowrap; overflow: hidden;">
+      Sistema de Gerenciamento Prof. Artur
+    </a>
 
-  <!-- Conteúdo + Sidebar -->
+    <!-- Container para botão e usuário -->
+    <div class="d-flex align-items-center ms-auto gap-3">
+      <!-- Botão hamburguer (visível apenas em telas menores) -->
+      <button class="btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar">
+        <i class="bi bi-list fs-3"></i>
+      </button>
+
+      <!-- Usuário -->
+      <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+           id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-circle fs-4 me-2"></i>
+          <span>Usuário</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="#">👤 Perfil</a></li>
+          <li><a class="dropdown-item" href="#">🔑 Alterar Senha</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">🚪 Sair</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+  <!-- Conteúdo principal -->
   <div class="container-fluid flex-grow-1 d-flex" style="padding-top: 68px;">
-    <div class="row flex-nowrap flex-grow-1 w-100">
-
-      <!-- Sidebar fixa -->
-      <div class="col-auto col-md-3 col-xl-2 px-1 bg-light border-end">
+    <!-- Sidebar offcanvas -->
+    <div class="offcanvas-lg offcanvas-start bg-light border-end" tabindex="-1" id="offcanvasSidebar">
+      <div class="offcanvas-header d-lg-none">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body p-0">
         {% include 'components/_sidebar.html' %}
       </div>
-
-      <!-- Conteúdo principal -->
-      <main class="col ps-3 pe-3 pt-4">
-        {% block content %}{% endblock %}
-      </main>
-
     </div>
+
+    <!-- Conteúdo -->
+    <main class="flex-grow-1 p-3">
+      {% block content %}{% endblock %}
+    </main>
   </div>
 
-  <!-- Rodapé fixado no fim -->
+  <!-- Footer -->
   <footer class="footer mt-auto py-3 text-center bg-light border-top">
     <div class="container">
       <span class="text-muted">© 2024 Laboratório de Automação e Controle</span>
     </div>
   </footer>
 
-  <!-- JS Essentials -->
+  <!-- JS -->
   {% include 'components/_js.html' %}
-  {% block extrascripts %}{% endblock %}
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" ...></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" ...></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" ...></script>
-
-  {% block script %}{% endblock %}
 </body>
-</html>

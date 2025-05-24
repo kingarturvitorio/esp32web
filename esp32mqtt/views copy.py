@@ -49,18 +49,11 @@ def status_dispositivos(request):
     dispositivos = Dispositivo.objects.all()
     data = {}
 
-    now = timezone.now()
     for d in dispositivos:
-        last = d.ultimo_ping
-        online = False
-        last_iso = None
-        if last:
-            online = (now - last) < timedelta(seconds=60)
-            last_iso = last.isoformat()
-        data[d.identificador] = {
-            "status":    "online" if online else "offline",
-            "last_ping": last_iso
-        }
+        online = (timezone.now() - d.ultimo_ping) < timedelta(seconds=60) if d.ultimo_ping else False
+        print(d)
+        data[d.identificador] = "online" if online else "offline"
+
     return JsonResponse(data)
 
 class SistemaMonitoramentoView(LoginRequiredMixin, ListView):
