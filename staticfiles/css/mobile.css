@@ -1,0 +1,15 @@
+/* style.css (ou dentro de <style> no head) */
+/* até lg (menos de 992px), truncar após 180px */
+.navbar-brand {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* a partir de lg, deixa fluir  */
+@media (min-width: 992px) {
+  .navbar-brand {
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+  }
+}
