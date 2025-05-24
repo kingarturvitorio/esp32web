@@ -1,6 +1,6 @@
 // device_status.js
 document.addEventListener('DOMContentLoaded', () => {
-  const API_URL = 'api/status-dispositivos/';  // ajuste se necessário
+  const API_URL = '/api/status-dispositivos/';  // ajuste se necessário
   let devices = {};  // vai guardar { ident: { status, last_ping: Date } }
 
   // Formata um delta (segundos) para HH:MM:SS
