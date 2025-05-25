@@ -1,69 +1,70 @@
-// device_status.js
+// static/js/device_status_socket.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = '/api/status-dispositivos/';  // ajuste se necessário
-    let devices = {};  // vai guardar { ident: { status, last_ping: Date } }
+  const ws = new WebSocket(
+    (location.protocol === "https:" ? "wss" : "ws")
+    + "://" + location.host
+    + "/ws/esp32/status/"
+  );
 
-    // Formata um delta (segundos) para HH:MM:SS
-    function fmtDelta(totalSecs) {
-        const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
-        const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
-        const s = Math.floor(totalSecs % 60).toString().padStart(2, '0');
-        return `${h}:${m}:${s}`;
+  ws.onopen = () => console.log("WebSocket conectado em", ws.url);
+  ws.onclose = () => console.log("WebSocket desconectado");
+  ws.onerror = e => console.error("WebSocket erro", e);
+
+  ws.onmessage = e => {
+    let msg;
+    try {
+      msg = JSON.parse(e.data);
+    } catch {
+      console.warn("JSON inválido:", e.data);
+      return;
     }
 
-    // Busca status e timestamps do servidor
-    async function fetchStatus() {
-        try {
-            const resp = await fetch(API_URL);
-            const data = await resp.json();
-            // data: { ident: {status, last_ping} }
-            for (const ident in data) {
-                const info = data[ident];
-                let lastDate = null;
-                if (info.last_ping) {
-                    // remove dígitos extras dos microssegundos: deixa só 3
-                    const cleaned = info.last_ping.replace(/(\.\d{3})\d+/, '$1');
-                    lastDate = new Date(cleaned);
-                }
-                devices[ident] = {
-                    status: info.status,
-                    last_ping: lastDate
-                };
-            }
-            // após atualizar devices, reflita no DOM imediatamente:
-            updateDOM();
-        } catch (e) {
-            console.error('Erro ao buscar status:', e);
-        }
+    const ident = msg.identificador;
+    const tipo  = msg.tipo;
+    const valor = msg.valor;
+
+    // apenas reaja a 'lwt' (online/offline) ou 'status' (uptime)
+    if (tipo !== "lwt" && tipo !== "status") {
+      return;
     }
 
-    // Atualiza badges e timers no DOM
-    function updateDOM() {
-        document.querySelectorAll('.device-card').forEach(card => {
-            const ident = card.dataset.ident;
-            const info = devices[ident];
-            if (!info) return;
-            // badge
-            const badge = card.querySelector('.status-badge');
-            badge.textContent = info.status === 'online'
-                ? '🟢 Online'
-                : '🔴 Offline';
-            badge.classList.toggle('bg-success', info.status === 'online');
-            badge.classList.toggle('bg-danger', info.status !== 'online');
-
-            // timer
-            const timerEl = card.querySelector('.timer');
-            if (info.status === 'online' && info.last_ping) {
-                const deltaSecs = (Date.now() - info.last_ping.getTime()) / 1000;
-                timerEl.textContent = fmtDelta(deltaSecs);
-            } else {
-                timerEl.textContent = '--:--:--';
-            }
-        });
+    // localiza o card e seus elementos
+    const card  = document.querySelector(`.device-card[data-ident="${ident}"]`);
+    const badge = card && card.querySelector(".status-badge");
+    const timer = document.getElementById(`timer-${ident}`);
+    if (!card || !badge || !timer) {
+      console.warn("Elementos não encontrados para", ident);
+      return;
     }
 
-    // Inicia tudo
-    fetchStatus();                      // primeira chamada
-    setInterval(fetchStatus, 30000);    // atualiza do servidor a cada 30s
-    setInterval(updateDOM, 1000);       // atualiza timers a cada 1s
+    if (tipo === "lwt") {
+      // LWT: payload é "online" ou "offline"
+      const isOnline = (valor === "online");
+      badge.textContent = isOnline ? "🟢 Online" : "🔴 Offline";
+      badge.classList.toggle("bg-success", isOnline);
+      badge.classList.toggle("bg-danger", !isOnline);
+
+      // se offline, zera o timer
+      if (!isOnline) {
+        timer.textContent = "--:--:--";
+      }
+    }
+
+    else if (tipo === "status") {
+      // Status: payload é JSON string com { uptime: <segundos>, ... }
+      let info;
+      try {
+        info = JSON.parse(valor);
+      } catch {
+        console.warn("JSON de status inválido:", valor);
+        return;
+      }
+      const secs = Number(info.uptime) || 0;
+      const h = String(Math.floor(secs/3600)).padStart(2,'0');
+      const m = String(Math.floor((secs%3600)/60)).padStart(2,'0');
+      const s = String(secs%60).padStart(2,'0');
+      timer.textContent = `${h}:${m}:${s}`;
+    }
+  };
 });

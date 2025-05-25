@@ -1,7 +1,18 @@
 # mqtt_consumer.py
-
 import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 import django
+django.setup()
+
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from channels_redis.core import RedisChannelLayer
+from controle_acesso.models import Cartao, EventoAcesso
+from esp32mqtt.models import Dispositivo, Medicao
+from influxdb_client.rest import ApiException
+import logging
+from django.conf import settings
+
+
 import json
 import threading
 import redis
@@ -9,27 +20,21 @@ import paho.mqtt.client as mqtt
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 import logging.config
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-django.setup()
-from django.conf import settings
+
+
 # carrega o dict LOGGING do settings.py
 logging.config.dictConfig(settings.LOGGING)
-import logging
 logger = logging.getLogger('mqtt_consumer')
 # --- 1) CONFIGURAÇÃO DO DJANGO ---
-from influxdb_client.rest import ApiException
 
-from esp32mqtt.models import Dispositivo, Medicao
-from controle_acesso.models import Cartao, EventoAcesso
-from channels_redis.core import RedisChannelLayer
 
 # --- 2) DEPENDÊNCIAS INFLUXDB ---
-from influxdb_client import InfluxDBClient, Point, WritePrecision
 
 # Carrega variáveis de ambiente (você pode usar python-dotenv ou definir no seu shell)
-INFLUX_URL    = "http://18.117.46.69:8086"     # ex: https://meu-influx.aws.com
-INFLUX_TOKEN  = "ibPbxd-wNhLzfZBjMAAxXUJ-Do2HZDQxWLaGC28I-csL2LdLlSjhUl_iE7s2DPDXAK6v2nT0i8OPnKfd_mjOCw=="   # token com permissão de escrita
-INFLUX_ORG    = "artur"     # nome da sua organização
+INFLUX_URL = "http://18.117.46.69:8086"     # ex: https://meu-influx.aws.com
+# token com permissão de escrita
+INFLUX_TOKEN = "ibPbxd-wNhLzfZBjMAAxXUJ-Do2HZDQxWLaGC28I-csL2LdLlSjhUl_iE7s2DPDXAK6v2nT0i8OPnKfd_mjOCw=="
+INFLUX_ORG = "artur"     # nome da sua organização
 INFLUX_BUCKET = "artur_v3"  # nome do bucket
 
 # Inicializa client Influx
@@ -48,11 +53,13 @@ redis_client = redis.StrictRedis(
     port=settings.REDIS_PORT,
     db=settings.REDIS_DB
 )
-pubsub      = redis_client.pubsub()
+pubsub = redis_client.pubsub()
 
 channel_layer = RedisChannelLayer(hosts=[("127.0.0.1", 6379)])
 
 # --- 4) FUNÇÃO PARA ESCUTAR COMANDOS via Redis ---
+
+
 def redis_listener():
     pubsub.subscribe("comandos_esp32")
     print("📡 Escutando comandos no canal Redis 'comandos_esp32'…")
@@ -72,57 +79,67 @@ def redis_listener():
             print("❌ Erro ao processar comando no Redis:", e)
 
 # --- 5) CALLBACKS MQTT ---
+
+
 def on_connect(client, userdata, flags, rc):
     print("🟢 Conectado ao MQTT (rc=%s)" % rc)
     client.subscribe("esp32/#")  # escuta todos tópicos esp32/
 
+
 def on_message(client, userdata, msg):
-    
+
     topic = msg.topic
     # 0) Ignore suas próprias respostas:
     if topic.endswith("/atuadores/2"):
         return
-    
-    print(f"💬 Mensagem recebida no MQTT — tópico: {msg.topic}, payload: {msg.payload}")
-    
-    
-    try:   
-        parts         = msg.topic.split('/')
-        identificador = parts[1]
-        tipo_dado     = parts[2]
-        payload       = msg.payload.decode()
-        timestamp     = timezone.now()
 
-        # 1) Atualiza ping do dispositivo
+    print(
+        f"💬 Mensagem recebida no MQTT — tópico: {msg.topic}, payload: {msg.payload}")
+
+    try:
+        parts = msg.topic.split('/')
+        identificador = parts[1]
+        tipo_dado = parts[2]
+        payload = msg.payload.decode()
+        timestamp = timezone.now()
+
+        # 1) Atualiza ping do dispositivo (inicia ou continua sessão de online)
         disp = Dispositivo.objects.get(identificador=identificador)
-        disp.ultimo_ping = timestamp
-        disp.save()
+        disp.marcar_ping(timestamp)
 
         if tipo_dado == 'rfid':
             # ── lida com RFID ──
             uid = payload
             try:
                 # já traz o usuario para não fazer outra query depois
-                cartao = Cartao.objects.select_related('usuario').get(uid=uid, ativo=True)
+                cartao = Cartao.objects.select_related(
+                    'usuario').get(uid=uid, ativo=True)
                 usuario = cartao.usuario
                 # você pode verificar is_active ou uma permissão específica aqui
                 autorizado = usuario.is_active
             except Cartao.DoesNotExist:
-                cartao     = None
-                usuario    = None
+                cartao = None
+                usuario = None
                 autorizado = False
 
             EventoAcesso.objects.create(
-                cartao      = cartao,
-                dispositivo = identificador,
-                autorizado  = autorizado
+                cartao=cartao,
+                dispositivo=identificador,
+                autorizado=autorizado
             )
 
             # Resposta ao ESP32
             topic_cmd = f'esp32/{identificador}/atuadores/2'
             payload_cmd = "on" if autorizado else "off"
             client.publish(topic_cmd, payload_cmd)
-
+        # 0) LWT: atualiza online/offline de verdade
+        if tipo_dado == 'lwt':
+            disp = Dispositivo.objects.get(identificador=identificador)
+            if payload == 'online':
+                disp.marcar_ping(timezone.now())
+            else:  # "offline"
+                disp.marcar_offline(timezone.now())
+            return
         else:
             # ── lida com sensores numéricos ──
             try:
@@ -131,9 +148,9 @@ def on_message(client, userdata, msg):
                 # 2.1) grava no Django
                 Medicao.objects.create(
                     dispositivo=disp,
-                    tipo       = tipo_dado,
-                    valor      = valor_float,
-                    timestamp  = timestamp
+                    tipo=tipo_dado,
+                    valor=valor_float,
+                    timestamp=timestamp
                 )
 
                 # 2.2) envia para o InfluxDB
@@ -163,12 +180,15 @@ def on_message(client, userdata, msg):
                     "tipo":          tipo_dado,
                     "valor":         payload,
                     "timestamp":     timestamp.isoformat()
+                                    # pega a propriedade que formatamos no model
+                    "uptime_str":    disp.uptime_str,
                 }
             }
         )
 
     except Exception:
         logger.exception("Erro no on_message")
+
 
 # --- 6) CONFIGURA E INICIA MQTT CLIENT ---
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)

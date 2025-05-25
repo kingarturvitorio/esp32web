@@ -33,7 +33,10 @@
             <span class="badge status-badge bg-danger">🔴 Offline</span>
             {% endif %}
             <div class="mt-1">
-              <small>Online há <span class="timer">--:--:--</span></small>
+              <small class="d-block mt-1 text-muted">
+                Tempo conexão:
+                <span id="timer-{{ d.identificador }}">{{ d.uptime_str }}</span>
+              </small>
             </div>
             <div class="mt-3 d-flex gap-2">
               <a href="{% url 'editar-dispositivos' d.pk %}" class="btn btn-success btn-sm">Editar</a>

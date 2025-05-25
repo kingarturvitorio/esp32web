@@ -28,6 +28,24 @@ class DispositivoListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Dispositivo.objects.filter(usuario=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        now = timezone.now()
+
+        for d in ctx['object_list']:
+            # calcula sessão atual
+            sessão = 0
+            if d.esta_online() and d.ultima_entrada_online:
+                sessão = (now - d.ultima_entrada_online).total_seconds()
+            total = d.tempo_online_acumulado + int(sessão)
+            h = total // 3600
+            m = (total % 3600) // 60
+            s = total % 60
+            # anexa no próprio objeto pra usar no template
+            d.uptime_str = f"{h:02d}:{m:02d}:{s:02d}"
+
+        return ctx
     
 class DispositivoUpdateView(LoginRequiredMixin, UpdateView):
     model = Dispositivo
@@ -46,21 +64,23 @@ class DispositivoDetailView(DetailView):
 
 ##view para retornar via ajax de forma automatica na tela
 def status_dispositivos(request):
-    dispositivos = Dispositivo.objects.all()
+    now = timezone.now()
     data = {}
 
-    now = timezone.now()
-    for d in dispositivos:
-        last = d.ultimo_ping
-        online = False
-        last_iso = None
-        if last:
-            online = (now - last) < timedelta(seconds=60)
-            last_iso = last.isoformat()
+    for d in Dispositivo.objects.all():
+        # se estiver online, some a sessão atual
+        sessao_atual = 0
+        if d.esta_online() and d.ultima_entrada_online:
+            sessao_atual = (now - d.ultima_entrada_online).total_seconds()
+
+        total_secs = d.tempo_online_acumulado + int(sessao_atual)
+
         data[d.identificador] = {
-            "status":    "online" if online else "offline",
-            "last_ping": last_iso
+            "status":    "online" if d.esta_online() else "offline",
+            "uptime":    total_secs,
+            "last_ping": d.ultimo_ping.isoformat() if d.ultimo_ping else None
         }
+
     return JsonResponse(data)
 
 class SistemaMonitoramentoView(LoginRequiredMixin, ListView):
