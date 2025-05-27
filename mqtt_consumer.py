@@ -179,9 +179,8 @@ def on_message(client, userdata, msg):
                     "identificador": identificador,
                     "tipo":          tipo_dado,
                     "valor":         payload,
-                    "timestamp":     timestamp.isoformat()
+                    "timestamp":     timestamp.isoformat(),
                                     # pega a propriedade que formatamos no model
-                    "uptime_str":    disp.uptime_str,
                 }
             }
         )
