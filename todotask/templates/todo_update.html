@@ -1,0 +1,17 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+{% block content %}
+<div class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h2 class="h4 fw-bold">Atualizar Tarefa</h2>
+    <a href="{% url 'todo-list' %}" class="btn btn-secondary">Cancelar</a>
+  </div>
+  <form method="post" class="px-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-warning">Atualizar</button>
+  </form>
+</div>
+{% endblock %}

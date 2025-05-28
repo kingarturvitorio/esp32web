@@ -38,6 +38,7 @@ urlpatterns = [
     path('', include('dashboard.urls')),
     path('acesso/', include('controle_acesso.urls')),
     path('api/', include(router.urls)),
+    path('', include('todotask.urls'))
 
 ]
 

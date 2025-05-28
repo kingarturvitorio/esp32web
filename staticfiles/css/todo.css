@@ -1,0 +1,67 @@
+#todo-page .section-container {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    background: #fafafa;
+}
+
+#todo-page .section-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+#todo-page .section-header .icon {
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+}
+
+#todo-page .todo-card {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+#todo-page .todo-card.completed {
+    background: #e6f7e6;
+    border-color: #a6d8a8;
+}
+
+#todo-page .todo-card .card-body {
+    padding-top: 1.5rem;
+    /* espaço para checkbox */
+}
+
+#todo-page .todo-card input[type=checkbox] {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    transform: scale(1.1);
+}
+
+#todo-page .todo-card .title {
+    margin-left: 0.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    /* menos negrito */
+}
+
+#todo-page .todo-card .title.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+#todo-page.todo-card .assignee,
+#todo-page .todo-card .timestamp {
+    margin-left: 0.25rem;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
