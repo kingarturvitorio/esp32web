@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.gis.db import models as gis_models # campos GIS
 
 class Dispositivo(models.Model):
     nome                   = models.CharField(max_length=100)
@@ -48,3 +49,19 @@ class Medicao(models.Model):
     tipo = models.CharField(max_length=50)
     valor = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class GpsFix(models.Model):
+    ident      = models.CharField(max_length=32, db_index=True)
+    location   = gis_models.PointField(srid=4326)      # lon/lat (WGS84)
+    alt        = models.FloatField(null=True, blank=True)
+    sats       = models.IntegerField(null=True, blank=True)
+    hdop       = models.FloatField(null=True, blank=True)
+    ts_device  = models.BigIntegerField(null=True, blank=True)  # timestamp do device
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["ident", "-created_at"])]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.ident} @ {self.created_at:%Y-%m-%d %H:%M:%S}"

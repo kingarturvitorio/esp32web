@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-u&4mrfs9sl+6@7^f!c4qtrsgnb=gtf)d%pvxfr1d2)qk*yq2*$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['18.117.46.69','127.0.0.1']
+ALLOWED_HOSTS = ['18.117.46.69','127.0.0.1','localhost']
 
 import os
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'paginas',
+    "django.contrib.gis",
     'cadastros',
     'crispy_forms',
     'crispy_bootstrap4',
@@ -49,8 +49,7 @@ INSTALLED_APPS = [
     'django_cleanup',
     'dashboard',
     'controle_acesso',
-    'widget_tweaks',
-    'todotask',
+    'widget_tweaks'
 ]
 
 #crispy forms
@@ -75,7 +74,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
@@ -105,12 +104,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": os.getenv("POSTGRES_DB", "appdb"),
+        "USER": os.getenv("POSTGRES_USER", "appuser"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "apppass"),
+        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

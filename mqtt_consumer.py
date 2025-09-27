@@ -31,11 +31,11 @@ logger = logging.getLogger('mqtt_consumer')
 # --- 2) DEPENDÊNCIAS INFLUXDB ---
 
 # Carrega variáveis de ambiente (você pode usar python-dotenv ou definir no seu shell)
-INFLUX_URL = "http://18.117.46.69:8086"     # ex: https://meu-influx.aws.com
+INFLUX_URL = "http://localhost:8086"     # ex: https://meu-influx.aws.com
 # token com permissão de escrita
-INFLUX_TOKEN = "ibPbxd-wNhLzfZBjMAAxXUJ-Do2HZDQxWLaGC28I-csL2LdLlSjhUl_iE7s2DPDXAK6v2nT0i8OPnKfd_mjOCw=="
-INFLUX_ORG = "artur"     # nome da sua organização
-INFLUX_BUCKET = "artur_v3"  # nome do bucket
+INFLUX_TOKEN = "supersecrettoken"
+INFLUX_ORG = "myorg"     # nome da sua organização
+INFLUX_BUCKET = "mybucket"  # nome do bucket
 
 # Inicializa client Influx
 influx_client = InfluxDBClient(
@@ -55,7 +55,7 @@ redis_client = redis.StrictRedis(
 )
 pubsub = redis_client.pubsub()
 
-channel_layer = RedisChannelLayer(hosts=[("127.0.0.1", 6379)])
+channel_layer = RedisChannelLayer(hosts=[("localhost", 6379)])
 
 # --- 4) FUNÇÃO PARA ESCUTAR COMANDOS via Redis ---
 
@@ -195,7 +195,7 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # conecte ao broker (pode ser localhost ou IP AWS)
-client.connect("18.117.46.69", 1883, 60)
+client.connect("127.0.0.1", 1883, 60)
 
 # Inicia thread para comandos Redis
 threading.Thread(target=redis_listener, daemon=True).start()

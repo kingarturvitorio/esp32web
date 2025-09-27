@@ -14,10 +14,26 @@
     <div class="card">
         <div class="card-body">
             <div class="input-group mb-3 mt-3" style="max-width: 300px;">
-                <button id="btn-setpoint" class="btn btn-secondary">Setar Setpoint</button>
+                <button id="btn-setpoint" type="button" class="btn btn-secondary">Setar Setpoint</button>
                 <input type="number" id="input-sp" class="form-control" placeholder="Setpoint" />
             </div>
 
+            <!-- ATUADOR 1 (servo) -->
+            <div class="input-group mb-3" style="max-width: 420px;">
+                <button id="btn-a1-on"  type="button" class="btn btn-success">Atuador 1 ON</button>
+                <button id="btn-a1-off"  type="button" class="btn btn-danger ms-2">Atuador 1 OFF</button>
+                <input type="number" id="input-a1-ang" class="form-control ms-2" placeholder="Ângulo (0-180)" />
+                <button id="btn-a1-ang" class="btn btn-primary ms-2">Enviar Ângulo</button>
+            </div>
+
+
+            <!-- ATUADOR 2 (trava/relé), opcional: por dispositivo -->
+            <div class="input-group mb-3" style="max-width: 420px;">
+                <input type="text" id="input-ident" class="form-control"
+                    placeholder="Ident (opcional p/ alvo específico)" />
+                <button id="btn-a2-on"  type="button" class="btn btn-success ms-2">Atuador 2 ON</button>
+                <button id="btn-a2-off" type="button" class="btn btn-danger ms-2">Atuador 2 OFF</button>
+            </div>
             <hr>
 
             <div class="row" id="dados-sensores">

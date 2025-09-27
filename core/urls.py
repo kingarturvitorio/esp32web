@@ -31,14 +31,12 @@ router.register(r'medicoes', MedicaoViewSet, basename='medicao')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('paginas.urls')),
     path('', include('cadastros.urls')),
     path('', include('esp32mqtt.urls')),
     path('', include('usuarios.urls')),
     path('', include('dashboard.urls')),
     path('acesso/', include('controle_acesso.urls')),
-    path('api/', include(router.urls)),
-    path('', include('todotask.urls'))
+    path('api/', include(router.urls))
 
 ]
 

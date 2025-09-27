@@ -1,0 +1,72 @@
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>GPS em tempo real</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 1) Mapa base
+    const map = L.map('map').setView([-15.78, -47.93], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 20, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // 2) Um marcador por dispositivo + trilha
+    const markers = {};   // ident -> L.marker
+    const trails  = {};   // ident -> L.polyline
+
+    function upsertMarker(msg) {
+      if (msg.tipo !== "gps") return;
+
+      const id  = msg.identificador;
+      const lat = Number(msg.lat);
+      const lon = Number(msg.lon);
+      if (Number.isNaN(lat) || Number.isNaN(lon)) return;
+
+      const ll = [lat, lon];
+      const popup = `
+        <b>${id}</b><br/>
+        lat: ${lat.toFixed(6)}<br/>
+        lon: ${lon.toFixed(6)}<br/>
+        sats: ${msg.sats ?? "-"}<br/>
+        hdop: ${msg.hdop ?? "-"}<br/>
+        ts: ${msg.created_at ?? msg.ts_device ?? "-"}
+      `;
+
+      if (markers[id]) {
+        markers[id].setLatLng(ll).setPopupContent(popup);
+        if (trails[id]) trails[id].addLatLng(ll);
+      } else {
+        markers[id] = L.marker(ll).addTo(map).bindPopup(popup);
+        trails[id]  = L.polyline([ll], {weight: 3}).addTo(map);
+        map.setView(ll, 15);
+      }
+    }
+
+    // 3) WebSocket
+    const scheme = location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${scheme}://${location.host}/ws/esp32/status/`);
+
+    ws.onopen = () => console.log("WS conectado");
+    ws.onclose = () => console.log("WS fechado");
+    ws.onerror = (e) => console.error("WS erro", e);
+    ws.onmessage = (ev) => {
+      try {
+        const data = JSON.parse(ev.data);
+        upsertMarker(data);
+      } catch (e) {
+        console.error("WS parse error:", e);
+      }
+    };
+  </script>
+</body>
+</html>

@@ -5,7 +5,7 @@ from .views import *
 
 urlpatterns = [
     #path('', view, name=""),
-    path('login/', user_login, name='login'),
+    path('', user_login, name='index'),
     path('logout/', logout_view, name='logout'),
     path('registra/', user_signup, name='registrar'),
     path('atualizar-dados/', PerfilUpdate.as_view(), name='atualizar-dados'),

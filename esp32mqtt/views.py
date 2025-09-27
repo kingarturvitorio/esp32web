@@ -11,6 +11,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils.dateparse import parse_datetime
 from django.http import StreamingHttpResponse
+from esp32mqtt.models import GpsFix
+import json
+from django.shortcuts import render
 
 class DispositivoCreateView(LoginRequiredMixin, CreateView):
     model = Dispositivo
@@ -163,3 +166,31 @@ def esp32_events(request):
             msg = redis_client.blpop('esp32_status')[1]
             yield f"data: {msg.decode()}\n\n"
     return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+
+
+def gps_latest_geojson(request):
+    """
+    Retorna um FeatureCollection com o último ponto de cada ident.
+    Usa DISTINCT ON (Postgres): order_by('ident','-created_at').distinct('ident')
+    """
+    qs = (GpsFix.objects
+          .order_by('ident', '-created_at')  # chave + mais recente
+          .distinct('ident'))
+
+    features = []
+    for row in qs:
+        geom = json.loads(row.location.geojson)  # {"type":"Point","coordinates":[lon,lat]}
+        props = {
+            "ident": row.ident,
+            "alt": row.alt,
+            "sats": row.sats,
+            "hdop": row.hdop,
+            "ts_device": row.ts_device,
+            "created_at": row.created_at.isoformat(),
+        }
+        features.append({"type": "Feature", "geometry": geom, "properties": props})
+
+    return JsonResponse({"type": "FeatureCollection", "features": features})
+
+def mapa_gps(request):
+    return render(request, "mapa.html")

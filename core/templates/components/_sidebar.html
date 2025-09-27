@@ -1,14 +1,8 @@
 <ul class="nav nav-pills flex-column">
   <li class="nav-item">
-    <a href="{% url 'todo-list' %}" class="nav-link {% if request.resolver_match.url_name == 'todo-list' %}active{% endif %}">
-      <i class="bi bi-calendar4-week me-2"></i> Lista de Atividades
-    </a>
-  </li>
-
-  <li class="nav-item">
     <a href="{% url 'sistema-monitoramento' %}" class="nav-link {% if request.resolver_match.url_name == 'sistema-monitoramento' %}active{% endif %}">
       <i class="bi bi-pc-display-horizontal me-2"></i>
-      Sistema de Monitoramento
+      Monitoramento
     </a>
   </li>
 

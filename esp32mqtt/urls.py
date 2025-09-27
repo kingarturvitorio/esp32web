@@ -13,4 +13,6 @@ urlpatterns = [
     path("api/status-dispositivos/", views.status_dispositivos, name="status-dispositivos"),
         # SSE (opcional) para atualizações live
     path('events/esp32/', views.esp32_events, name='esp32-events'),
+    path("api/gps/latest.geojson", views.gps_latest_geojson, name="gps_latest_geojson"),
+    path("mapa/gps/", views.mapa_gps, name="mapa_gps"),
 ]
